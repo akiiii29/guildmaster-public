@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { hasTestAccess, verifyTestAccess } from './accessGate'
+import { demoGameSnapshot } from './demoData'
 import { getPwaInstallState, requestPwaInstall, subscribeToPwaInstallState, type PwaInstallState } from './pwa/install'
 import './styles.css'
 
@@ -96,13 +97,41 @@ function FrontendShell() {
   return <main className="shell-screen">
     <section className="shell-card">
       <Header />
-      <span className="eyebrow">Frontend boundary</span>
-      <h1>Production game UI omitted</h1>
-      <p>This public snapshot contains the access/PWA flow and safe API interfaces. Production game screens, content tables, images and backend adapters stay private.</p>
-      <div className="boundary-grid"><article><strong>Included</strong><span>React shell, PWA checks and access flow.</span></article><article><strong>Not included</strong><span>Assets, game data, API endpoints and server code.</span></article></div>
+      <span className="eyebrow">Sanitized demo data</span>
+      <h1>Frontend shape, without production content</h1>
+      <p>This public snapshot includes small synthetic values so the UI and API contract are inspectable. They are not live character stats, dungeon balance or economy values.</p>
+      <DemoDataPreview />
+      <div className="boundary-grid"><article><strong>Included</strong><span>React shell, PWA/access flow, schemas and synthetic demo data.</span></article><article><strong>Private</strong><span>Production assets, live data, API endpoints and server code.</span></article></div>
       <a href={PUBLIC_REPOSITORY} target="_blank" rel="noreferrer">↗ Browse this repository</a>
     </section>
   </main>
+}
+
+function DemoDataPreview() {
+  return <section className="demo-preview" aria-labelledby="demo-data-title">
+    <div className="demo-heading">
+      <div><span className="eyebrow">Mock snapshot</span><h2 id="demo-data-title">Sample guild state</h2></div>
+      <span className="demo-badge">NOT LIVE</span>
+    </div>
+    <div className="resource-row">
+      <span><small>Gems</small><strong>{demoGameSnapshot.resources.gems}</strong></span>
+      <span><small>Rations</small><strong>{demoGameSnapshot.resources.rations}</strong></span>
+      <span><small>Dungeon</small><strong>{demoGameSnapshot.activeDungeon.floor}/{demoGameSnapshot.activeDungeon.totalFloors}</strong></span>
+    </div>
+    <div className="demo-list">
+      {demoGameSnapshot.characters.map((character) => <article className="demo-character" key={character.id}>
+        <div className="demo-character-heading"><div><strong>{character.name}</strong><small>Lv {character.level} · {character.className}</small></div><span className={`status-pill status-${character.status}`}>{character.status}</span></div>
+        <div className="stat-grid">
+          <span><small>HP</small><strong>{character.stats.hp}</strong></span>
+          <span><small>ATK</small><strong>{character.stats.attack}</strong></span>
+          <span><small>DEF</small><strong>{character.stats.defense}</strong></span>
+          <span><small>SPD</small><strong>{character.stats.speed}</strong></span>
+        </div>
+        <small className="equipment-line">Equipment: {character.equipment.join(' · ')}</small>
+      </article>)}
+    </div>
+    <div className="dungeon-preview"><div><strong>{demoGameSnapshot.activeDungeon.name}</strong><small>Floor {demoGameSnapshot.activeDungeon.floor} of {demoGameSnapshot.activeDungeon.totalFloors} · {demoGameSnapshot.activeDungeon.danger} danger</small></div><span>+{demoGameSnapshot.activeDungeon.rewardPreview.xp} XP · +{demoGameSnapshot.activeDungeon.rewardPreview.gems} gems</span></div>
+  </section>
 }
 
 export default function App() {
