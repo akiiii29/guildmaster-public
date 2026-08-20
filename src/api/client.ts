@@ -1,6 +1,8 @@
+import { demoGameSnapshot, type DemoGameSnapshot } from '../demoData'
+
 export interface PublicGameApi {
-  restore(): Promise<never>
-  submitAction(action: string, payload: unknown): Promise<never>
+  restore(): Promise<DemoGameSnapshot>
+  submitAction(action: string, payload: unknown): Promise<{ ok: boolean; snapshot: DemoGameSnapshot }>
 }
 
 /**
@@ -18,6 +20,22 @@ export function createPublicApiClient(): PublicGameApi {
       void action
       void payload
       return unavailable()
+    },
+  }
+}
+
+/**
+ * Local-only adapter for the synthetic snapshot. It demonstrates the shape a
+ * UI can consume without making a network request or pretending to be the
+ * production game service.
+ */
+export function createDemoApiClient(): PublicGameApi {
+  return {
+    restore: async () => demoGameSnapshot,
+    submitAction: async (action: string, payload: unknown) => {
+      void action
+      void payload
+      return { ok: true, snapshot: demoGameSnapshot }
     },
   }
 }
