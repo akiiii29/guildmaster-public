@@ -11,7 +11,6 @@ export interface PwaInstallState {
 }
 
 export type PwaInstallResult = 'accepted' | 'dismissed' | 'unavailable'
-
 type InstallSubscriber = () => void
 
 let deferredPrompt: BeforeInstallPromptEvent | null = null
@@ -35,12 +34,7 @@ export function isStandaloneApp() {
 
 export function getPwaInstallState(): PwaInstallState {
   const standalone = isStandaloneApp()
-  return {
-    installed: installedDuringSession || standalone,
-    standalone,
-    ios: isIosDevice(),
-    promptAvailable: deferredPrompt !== null,
-  }
+  return { installed: installedDuringSession || standalone, standalone, ios: isIosDevice(), promptAvailable: deferredPrompt !== null }
 }
 
 function notifySubscribers() {
@@ -50,36 +44,29 @@ function notifySubscribers() {
 export function startPwaInstallCapture() {
   if (captureStarted || typeof window === 'undefined') return
   captureStarted = true
-
   window.addEventListener('beforeinstallprompt', (event) => {
     event.preventDefault()
     deferredPrompt = event as BeforeInstallPromptEvent
     notifySubscribers()
   })
-
   window.addEventListener('appinstalled', () => {
     deferredPrompt = null
     installedDuringSession = true
     notifySubscribers()
   })
-
   window.matchMedia('(display-mode: standalone)').addEventListener('change', notifySubscribers)
 }
 
 export function subscribeToPwaInstallState(subscriber: InstallSubscriber) {
   subscribers.add(subscriber)
-  return () => {
-    subscribers.delete(subscriber)
-  }
+  return () => { subscribers.delete(subscriber) }
 }
 
 export async function requestPwaInstall(): Promise<PwaInstallResult> {
   const prompt = deferredPrompt
   if (!prompt) return 'unavailable'
-
   deferredPrompt = null
   notifySubscribers()
   await prompt.prompt()
-  const choice = await prompt.userChoice
-  return choice.outcome
+  return (await prompt.userChoice).outcome
 }
