@@ -1,12 +1,14 @@
-# Guild Master — public transparency snapshot
+# Guild Master — public frontend snapshot
 
-This is the public companion repository for Guild Master. It exists so players
-can inspect the PWA installation behavior and the high-level security boundary
-without exposing the production game package.
+This is a small, buildable frontend snapshot for Guild Master. It exists so
+players can inspect the access gate, PWA installation flow and frontend/API
+boundary without exposing the production game package.
 
 ## What is included
 
-- The standalone-PWA detection and install-prompt state used by the web client.
+- A React/Vite shell showing the access gate and installed-PWA gate.
+- Standalone-PWA detection and install-prompt state.
+- A frontend-only API contract with safe unavailable adapters.
 - A plain-language description of the production trust boundary.
 
 ## What is intentionally omitted
@@ -19,9 +21,20 @@ the private production project or its deployment services:
 - Supabase Edge Functions, database migrations and server-side shared code;
 - environment files, service-role keys, payment secrets and admin credentials.
 
-The installed game still uses its deployed web client and authenticated online
-services. Removing these files from this public snapshot prevents a simple
-repository clone from reproducing the production package.
+The demo shell intentionally stops at the frontend boundary. It does not
+contain production content, images or game actions, so cloning this repository
+does not reproduce the playable game.
+
+## Run the public snapshot
+
+```sh
+npm install
+npm run dev
+```
+
+The demo access screen accepts hashes supplied through
+`VITE_PUBLIC_DEMO_ACCESS_HASHES` as a comma-separated list. No production
+invite code is included in this repository.
 
 ## Security note
 

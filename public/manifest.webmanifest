@@ -1,0 +1,9 @@
+{
+  "name": "Guild Master — public frontend snapshot",
+  "short_name": "Guild Master",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#151617",
+  "theme_color": "#151617"
+}
